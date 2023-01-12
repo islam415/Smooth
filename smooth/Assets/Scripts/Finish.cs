@@ -1,44 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class Finish : MonoBehaviour
 {
-    public GameManager gameManager;
+    public Animator anim;
+    public Vector3 pos;
     public InputControl control;
-    int score = 0;
-    public TextMeshProUGUI point;
-    public GameObject panel;
-    private void Update()
-    {
-        Debug.Log(score);
-    }
+    public int score = 0;
+    public GameManager gameManager;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag=="Collect")
+        if (other.tag == "Collect" || other.tag == "Collected")
         {
-            PlayerControl.instance.set = true;
-            //Destroy(other.GetComponent<Movement>());
-            other.transform.parent = null;
-            other.transform.position = transform.position + new Vector3(0, .5f, 1f) + (new Vector3(0, .5f, 0) * transform.childCount);
-            other.transform.parent = transform;
-        }
-        else if (other.tag=="cup")
-        {
-            score += 5;
-        }
-        else if (other.tag == "gold")
-        {
-            score+= 10;
+            Destroy(PlayerControl.instance.stackList[PlayerControl.instance.stackList.Count - 1]);
+            PlayerControl.instance.stackList.RemoveAt(PlayerControl.instance.stackList.Count - 1);
+            score += 1;
+            Debug.Log(score);
         }
         else if (other.tag == "Player")
         {
-            PlayerControl.instance.moveSpeed= 0;
-            PlayerControl.instance.stop();
+            Debug.Log("score: " + score);
             control.gameStart = false;
-            panel.SetActive(true);
-            point.text = score.ToString();
+            other.transform.parent = null;
+            other.transform.position = new Vector3(other.transform.position.x,
+            other.transform.position.y, transform.position.z);
+            PlayerControl.instance.pos();
+            PlayerControl.instance.stop();
+            PlayerControl.instance.set = true;
+            anim.SetBool("finish", true);
         }
     }
 }
